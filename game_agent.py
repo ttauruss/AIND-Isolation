@@ -124,7 +124,6 @@ class CustomPlayer:
         # move from the game board (i.e., an opening book), or returning
         # immediately if there are no legal moves
         if game.get_player_location(game.active_player) == isolation.Board.NOT_MOVED:
-            print('Not moved yet - returning random move')
             legal_moves = game.get_legal_moves()
             return legal_moves[random.randint(0, len(legal_moves)-1)]
 
@@ -179,15 +178,19 @@ class CustomPlayer:
 
         moves = game.get_legal_moves()
         if depth == 0 or moves == []:
-            return self.score(game, game.active_player), (-1, -1)
+            if maximizing_player:
+                return self.score(game, game.active_player), (-1, -1)
+            else:
+                return self.score(game, game.inactive_player), (-1, -1)
         if maximizing_player:
             score = float('-inf')
         else:
             score = float('inf')
         best_move = (-1, -1)
         for mv in moves:
-            game_copy = game.copy()
-            game_copy.apply_move(mv)
+            # game_copy = game.copy()
+            game_copy = game.forecast_move(mv)
+            # game_copy.apply_move(mv)
             new_score, new_best_move = self.minimax(game_copy, depth - 1, not maximizing_player)
             if (maximizing_player and new_score > score) or (not maximizing_player and new_score < score):
                 score = new_score
