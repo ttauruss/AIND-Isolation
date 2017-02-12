@@ -133,11 +133,23 @@ class CustomPlayer:
             # here in order to avoid timeout. The try/except block will
             # automatically catch the exception raised by the search method
             # when the timer gets close to expiring
-            score, best_move = self.minimax(game, self.search_depth)
+            if not self.iterative:
+                if self.method == 'minimax':
+                    score, best_move = self.minimax(game, self.search_depth)
+                else:
+                    score, best_move = self.alphabeta(game, self.search_depth)
+            else:
+                depth = 0
+                while True:
+                    if self.method == 'minimax':
+                        score, best_move = self.minimax(game, depth)
+                    else:
+                        score, best_move = self.alphabeta(game, depth)
+                    depth += 1
 
         except Timeout:
-            # Handle any actions required at timeout, if necessary
-            return best_move
+            print('Timeout')
+            pass
 
         return best_move
 
