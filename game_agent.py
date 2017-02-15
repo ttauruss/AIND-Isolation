@@ -37,9 +37,28 @@ def custom_score(game, player):
         The heuristic value of the current game state to the specified player.
     """
 
-    # TODO: finish this function!
-    raise NotImplementedError
+    if game.is_loser(player):
+        return float('-inf')
+    if game.is_winner(player):
+        return float('inf')
 
+    my_moves = len(game.get_legal_moves(player))
+    opp_moves = len(game.get_legal_moves(game.get_opponent(player)))
+
+    # loc = game.get_player_location(player)
+    # free_area_size = 0
+    # blanks = game.get_blank_spaces()
+    # for i in (loc[0]-2, loc[0]+3):
+        # for j in (loc[1]-2, loc[1]+3):
+            # if (i, j) in blanks:
+                # free_area_size += 1
+
+    # return float(my_moves - 2 * opp_moves + (2 * free_are_size) / 25)
+    # return float(my_moves - 2 * opp_moves)
+    if len(game.get_blank_spaces()) >  (game.width * game.height) / 4:
+        return (opp_moves - my_moves)
+    else:
+        return (my_moves - opp_moves)
 
 class CustomPlayer:
     """Game-playing agent that chooses a move using your evaluation function
@@ -148,7 +167,6 @@ class CustomPlayer:
                     depth += 1
 
         except Timeout:
-            print('Timeout')
             pass
 
         return best_move
