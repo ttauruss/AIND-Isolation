@@ -55,10 +55,24 @@ def custom_score(game, player):
 
     # return float(my_moves - 2 * opp_moves + (2 * free_are_size) / 25)
     # return float(my_moves - 2 * opp_moves)
-    if len(game.get_blank_spaces()) >  (game.width * game.height) / 4:
-        return (opp_moves - my_moves)
+    # if game.dead_moves == None:
+        # game.dead_moves = 0
+    # if game.change_strategy == None:
+        # game.change_strategy = False
+    # print(my_moves)
+    # if my_moves == 1:
+        # game.dead_moves += 1
+        # game.change_strategy = True
+        # print(game.dead_moves)
+    # if game.change_strategy:
+        # return (my_moves - opp_moves)
+    # else:
+    blank_size = len(game.get_blank_spaces())
+    field_size = game.width * game.height
+    if blank_size > field_size / 2:
+        return float(opp_moves - my_moves)
     else:
-        return (my_moves - opp_moves)
+        return float(my_moves - opp_moves)
 
 class CustomPlayer:
     """Game-playing agent that chooses a move using your evaluation function
