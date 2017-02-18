@@ -8,71 +8,14 @@ relative strength using tournament.py and include the results in your report.
 """
 import random
 import isolation
+import heuristic
 
 class Timeout(Exception):
     """Subclass base exception for code clarity."""
     pass
 
-
 def custom_score(game, player):
-    """Calculate the heuristic value of a game state from the point of view
-    of the given player.
-
-    Note: this function should be called from within a Player instance as
-    `self.score()` -- you should not need to call this function directly.
-
-    Parameters
-    ----------
-    game : `isolation.Board`
-        An instance of `isolation.Board` encoding the current state of the
-        game (e.g., player locations and blocked cells).
-
-    player : object
-        A player instance in the current game (i.e., an object corresponding to
-        one of the player objects `game.__player_1__` or `game.__player_2__`.)
-
-    Returns
-    -------
-    float
-        The heuristic value of the current game state to the specified player.
-    """
-
-    if game.is_loser(player):
-        return float('-inf')
-    if game.is_winner(player):
-        return float('inf')
-
-    my_moves = len(game.get_legal_moves(player))
-    opp_moves = len(game.get_legal_moves(game.get_opponent(player)))
-
-    # loc = game.get_player_location(player)
-    # free_area_size = 0
-    # blanks = game.get_blank_spaces()
-    # for i in (loc[0]-2, loc[0]+3):
-        # for j in (loc[1]-2, loc[1]+3):
-            # if (i, j) in blanks:
-                # free_area_size += 1
-
-    # return float(my_moves - 2 * opp_moves + (2 * free_are_size) / 25)
-    # return float(my_moves - 2 * opp_moves)
-    # if game.dead_moves == None:
-        # game.dead_moves = 0
-    # if game.change_strategy == None:
-        # game.change_strategy = False
-    # print(my_moves)
-    # if my_moves == 1:
-        # game.dead_moves += 1
-        # game.change_strategy = True
-        # print(game.dead_moves)
-    # if game.change_strategy:
-        # return (my_moves - opp_moves)
-    # else:
-    blank_size = len(game.get_blank_spaces())
-    field_size = game.width * game.height
-    if blank_size > field_size / 2:
-        return float(opp_moves - my_moves)
-    else:
-        return float(my_moves - opp_moves)
+    return heuristic.custom_score(game, player)
 
 class CustomPlayer:
     """Game-playing agent that chooses a move using your evaluation function
@@ -151,8 +94,6 @@ class CustomPlayer:
 
         self.time_left = time_left
 
-        # TODO: finish this function!
-
         # Perform any required initializations, including selecting an initial
         # move from the game board (i.e., an opening book), or returning
         # immediately if there are no legal moves
@@ -161,6 +102,7 @@ class CustomPlayer:
             return legal_moves[random.randint(0, len(legal_moves)-1)]
 
         best_move = (-1, -1)
+        best_moves = {}
         try:
             # The search method call (alpha beta or minimax) should happen in
             # here in order to avoid timeout. The try/except block will
@@ -168,19 +110,32 @@ class CustomPlayer:
             # when the timer gets close to expiring
             if not self.iterative:
                 if self.method == 'minimax':
-                    score, best_move = self.minimax(game, self.search_depth)
+                    _, best_move = self.minimax(game, self.search_depth)
                 else:
-                    score, best_move = self.alphabeta(game, self.search_depth)
+                    _, best_move = self.alphabeta(game, self.search_depth)
             else:
-                depth = 0
+                depth = 1
                 while True:
                     if self.method == 'minimax':
-                        score, best_move = self.minimax(game, depth)
+                        _, new_move = self.minimax(game, depth)
                     else:
-                        score, best_move = self.alphabeta(game, depth)
+                        _, new_move = self.alphabeta(game, depth)
+                    if new_move != (-1, -1):
+                        best_move = new_move
+                    best_moves[depth] = best_move
                     depth += 1
 
         except Timeout:
+            if best_move == (-1, -1):
+                legal_moves = game.get_legal_moves()
+                if len(legal_moves) > 0:
+                    print('Returning random move')
+                    print('Max depth ' + str(depth))
+                    print(best_moves)
+                    res = legal_moves[random.randint(0, len(legal_moves)-1)]
+                    print(legal_moves)
+                    print(res)
+                    return res
             pass
 
         return best_move
@@ -208,7 +163,7 @@ class CustomPlayer:
             The score for the current search branch
 
         
-        uple(int, int)
+        tuple(int, int)
             The best move for the current branch; (-1, -1) for no legal moves
 
         Notes
@@ -284,34 +239,31 @@ class CustomPlayer:
         if self.time_left() < self.TIMER_THRESHOLD:
             raise Timeout()
 
-        moves = game.get_legal_moves()
-        if depth == 0 or moves == []:
-            if maximizing_player:
-                return self.score(game, game.active_player), (-1, -1)
-            else:
-                return self.score(game, game.inactive_player), (-1, -1)
+        if depth == 0:
+            return self.score(game, self), (-1, -1)
+
+
         if maximizing_player:
-            score = float('-inf')
+            best_score = float('-inf')
         else:
-            score = float('inf')
+            best_score = float('inf')
+
         best_move = (-1, -1)
-        for mv in moves:
+        for mv in game.get_legal_moves():
             game_copy = game.forecast_move(mv)
-            new_score, new_best_move = self.alphabeta(game_copy, depth - 1, alpha, beta, not maximizing_player)
+            new_score, _ = self.alphabeta(game_copy, depth - 1, alpha, beta, not maximizing_player)
             if maximizing_player:
-                if new_score > score:
-                    score = new_score
-                    best_move = mv
-                if score >= beta:
-                    return score, best_move
-                alpha = max(alpha, score)
+                if new_score > best_score:
+                    best_score, best_move = new_score, mv
+                if best_score >= beta:
+                    return best_score, best_move
+                alpha = max(alpha, best_score)
             else:
-                if new_score < score:
-                    score = new_score
-                    best_move = mv
-                if score <= alpha:
-                    return score, best_move
-                beta = min(beta, score)
-        return score, best_move
+                if new_score < best_score:
+                    best_score, best_move = new_score, mv
+                if best_score <= alpha:
+                    return best_score, best_move
+                beta = min(beta, best_score)
+        return best_score, best_move
 
 
