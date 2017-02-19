@@ -23,6 +23,7 @@ import itertools
 import random
 import warnings
 import os
+import sys
 
 from collections import namedtuple
 
@@ -34,7 +35,7 @@ from sample_players import improved_score
 from game_agent import CustomPlayer
 from game_agent import custom_score
 
-NUM_MATCHES = 5  # number of matches against each opponent
+NUM_MATCHES = 50  # number of matches against each opponent
 TIME_LIMIT = 150  # number of milliseconds before timeout
 
 TIMEOUT_WARNING = "One or more agents lost a match this round due to " + \
@@ -124,6 +125,7 @@ def play_round(agents, num_matches):
         for p1, p2 in itertools.permutations((agent_1.player, agent_2.player)):
             for _ in range(num_matches):
                 score_1, score_2 = play_match(p1, p2)
+                sys.stdout.flush()
                 counts[p1] += score_1
                 counts[p2] += score_2
                 total += score_1 + score_2
@@ -163,26 +165,22 @@ def main():
     # faster or slower computers.
     # test_agents = [Agent(CustomPlayer(score_fn=improved_score, **CUSTOM_ARGS), "ID_Improved"),
                    # Agent(CustomPlayer(score_fn=custom_score, **CUSTOM_ARGS), "Student")]
-    test_agents = [Agent(CustomPlayer(score_fn=improved_score, **CUSTOM_ARGS), "ID_Improved")]
-    # test_agents = [Agent(CustomPlayer(score_fn=custom_score, **CUSTOM_ARGS), "Student")]
+    # test_agents = [Agent(CustomPlayer(score_fn=improved_score, **CUSTOM_ARGS), "ID_Improved")]
+    test_agents = [Agent(CustomPlayer(score_fn=custom_score, **CUSTOM_ARGS), "Student")]
 
     print(DESCRIPTION)
-    win_ratios = []
-    for tr in range(10):
-        for agentUT in test_agents:
-            print("")
-            print("*************************")
-            print("{:^25}".format("Evaluating: " + agentUT.name))
-            print("*************************")
+    for agentUT in test_agents:
+        print("")
+        print("*************************")
+        print("{:^25}".format("Evaluating: " + agentUT.name))
+        print("*************************")
 
-            agents = random_agents + mm_agents + ab_agents + [agentUT]
-            win_ratio = play_round(agents, NUM_MATCHES)
-            win_ratios.append(win_ratio)
-            os.system('echo ' + str(win_ratio) + ' >> /home/tau/scores.txt')
+        agents = random_agents + mm_agents + ab_agents + [agentUT]
+        win_ratio = play_round(agents, NUM_MATCHES)
 
-            print("\n\nResults:")
-            print("----------")
-            print("{!s:<15}{:>10.2f}%".format(agentUT.name, win_ratio))
+        print("\n\nResults:")
+        print("----------")
+        print("{!s:<15}{:>10.2f}%".format(agentUT.name, win_ratio))
 
 
 if __name__ == "__main__":
