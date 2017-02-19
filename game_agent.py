@@ -14,8 +14,47 @@ class Timeout(Exception):
     """Subclass base exception for code clarity."""
     pass
 
+def custom_score_location(game, player):
+    if game.is_loser(player):
+        return float("-inf")
+
+    if game.is_winner(player):
+        return float("inf")
+
+    my_moves = len(game.get_legal_moves(player))
+    opp_moves = len(game.get_legal_moves(game.get_opponent(player)))
+    loc = game.get_player_location(player)
+
+    return float(my_moves - opp_moves) + float(loc[0] * loc[1]) / float(game.move_count)
+
+def custom_score_opposite(game, player):
+    if game.is_loser(player):
+        return float("-inf")
+
+    if game.is_winner(player):
+        return float("inf")
+
+    my_moves = len(game.get_legal_moves(player))
+    opp_moves = len(game.get_legal_moves(game.get_opponent(player)))
+
+    if game.move_count < float(game.width * game.height) / 3:
+        return float(opp_moves - my_moves)
+    else:
+        return float(my_moves - opp_moves)
+
+def improved_optimized(game, player):
+    my_moves = len(game.get_legal_moves(player))
+    if player == game.active_player and my_moves == 0:
+        return float('-inf')
+
+    opp_moves = len(game.get_legal_moves(game.get_opponent(player)))
+    if player == game.inactive_player and opp_moves == 0:
+        return float('inf')
+
+    return float(my_moves - opp_moves)
+
 def custom_score(game, player):
-    return heuristic.custom_score(game, player)
+    return custom_score_location(game, player)
 
 class CustomPlayer:
     """Game-playing agent that chooses a move using your evaluation function
@@ -102,7 +141,6 @@ class CustomPlayer:
             return legal_moves[random.randint(0, len(legal_moves)-1)]
 
         best_move = (-1, -1)
-        best_moves = {}
         try:
             # The search method call (alpha beta or minimax) should happen in
             # here in order to avoid timeout. The try/except block will
@@ -117,25 +155,17 @@ class CustomPlayer:
                 depth = 1
                 while True:
                     if self.method == 'minimax':
-                        _, new_move = self.minimax(game, depth)
+                        _, best_move = self.minimax(game, depth)
                     else:
-                        _, new_move = self.alphabeta(game, depth)
-                    if new_move != (-1, -1):
-                        best_move = new_move
-                    best_moves[depth] = best_move
+                        _, best_move = self.alphabeta(game, depth)
                     depth += 1
 
         except Timeout:
+            # return onen of the legal moves if algorithm returned invalid move
             if best_move == (-1, -1):
                 legal_moves = game.get_legal_moves()
                 if len(legal_moves) > 0:
-                    print('Returning random move')
-                    print('Max depth ' + str(depth))
-                    print(best_moves)
-                    res = legal_moves[random.randint(0, len(legal_moves)-1)]
-                    print(legal_moves)
-                    print(res)
-                    return res
+                    return legal_moves[random.randint(0, len(legal_moves)-1)]
             pass
 
         return best_move
@@ -175,25 +205,23 @@ class CustomPlayer:
         if self.time_left() < self.TIMER_THRESHOLD:
             raise Timeout()
 
-        moves = game.get_legal_moves()
-        if depth == 0 or moves == []:
-            if maximizing_player:
-                return self.score(game, game.active_player), (-1, -1)
-            else:
-                return self.score(game, game.inactive_player), (-1, -1)
+        if depth == 0:
+            return self.score(game, self), (-1, -1)
+
         if maximizing_player:
             score = float('-inf')
         else:
             score = float('inf')
+
         best_move = (-1, -1)
-        for mv in moves:
-            # game_copy = game.copy()
+
+        for mv in game.get_legal_moves():
             game_copy = game.forecast_move(mv)
-            # game_copy.apply_move(mv)
             new_score, new_best_move = self.minimax(game_copy, depth - 1, not maximizing_player)
             if (maximizing_player and new_score > score) or (not maximizing_player and new_score < score):
                 score = new_score
                 best_move = mv
+
         return score, best_move
 
 
@@ -242,13 +270,13 @@ class CustomPlayer:
         if depth == 0:
             return self.score(game, self), (-1, -1)
 
-
         if maximizing_player:
             best_score = float('-inf')
         else:
             best_score = float('inf')
 
         best_move = (-1, -1)
+
         for mv in game.get_legal_moves():
             game_copy = game.forecast_move(mv)
             new_score, _ = self.alphabeta(game_copy, depth - 1, alpha, beta, not maximizing_player)
@@ -264,6 +292,7 @@ class CustomPlayer:
                 if best_score <= alpha:
                     return best_score, best_move
                 beta = min(beta, best_score)
+
         return best_score, best_move
 
 
