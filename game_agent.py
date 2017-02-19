@@ -8,7 +8,6 @@ relative strength using tournament.py and include the results in your report.
 """
 import random
 import isolation
-import heuristic
 
 class Timeout(Exception):
     """Subclass base exception for code clarity."""
@@ -25,6 +24,9 @@ def custom_score_location(game, player):
     opp_moves = len(game.get_legal_moves(game.get_opponent(player)))
     loc = game.get_player_location(player)
 
+    # add location feature to the score
+    # the idea is to prefer moves in the bottom right part of the board in the beginning
+    # of the game
     return float(my_moves - opp_moves) + float(loc[0] * loc[1]) / float(game.move_count)
 
 def custom_score_opposite(game, player):
@@ -37,6 +39,7 @@ def custom_score_opposite(game, player):
     my_moves = len(game.get_legal_moves(player))
     opp_moves = len(game.get_legal_moves(game.get_opponent(player)))
 
+    # prefer moves closer to the sides in the beginning of the game
     if game.move_count < float(game.width * game.height) / 3:
         return float(opp_moves - my_moves)
     else:
