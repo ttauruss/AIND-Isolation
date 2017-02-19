@@ -5,6 +5,8 @@ The following table summarizes the comparison of the improved heuristic versus s
 
 The first heuristic I tried is just an optimization on the improved heuristic. I noticed the redundant call to `get_legal_move` function which can be done only once in heuristic function to speed up the search and increase the depth. The results show no improvement.
 
+The second try was to do the opposite of what the improved heuristic does - prefer boards with minimum moves for the agent. It wasn't much different from the improved heuristic.
+
 Opponent | ID_Improved | Improved_Optimized | Opposite
 ------- | ---------- | --------- | -----------
 Total | 75.71%   | 75.36% | 71.21%
