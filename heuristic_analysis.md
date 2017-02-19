@@ -1,7 +1,11 @@
 
 # Heuristic analysis
 
-Opponent | ID_Improved | Student1
+The following table summarizes the comparison of the improved heuristic versus student heuristics.
+
+The first heuristic I tried is just an optimization on the improved heuristic. I noticed the redundant call to get_legal_move function which can be done only once in heuristic function to speed up the search and increase the depth. The results show no improvement.
+
+Opponent | ID_Improved | Improved_Optimized
 ------- | ---------- | ---------
 Total | 75.71%   | 75.36%
 Random | 190/10 | 191/9
