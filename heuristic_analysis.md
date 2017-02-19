@@ -15,7 +15,9 @@ else:
 The results are in the Opposite column and not much different from ID_Improved.
 
 The last heuristic takes the same idea to cover the board more evenly first in the area with high indices by adding the product of location coordinates to the score according to this formula:  
-`(my_moves-opp_moves) + (locx * locy) / move_count`  
+```
+(my_moves - opp_moves) + (locx * locy) / move_count
+```
 I divide it by `move_count` to decrease the importance of location feature as game goes on.
 This heuristic is called Location in the table and that's the one I decided to submit as my custom_score.
 
