@@ -46,6 +46,8 @@ def custom_score_opposite(game, player):
         return float(my_moves - opp_moves)
 
 def improved_optimized(game, player):
+    # optimize the improved heuristic by calling get_legal_moves only once
+
     my_moves = len(game.get_legal_moves(player))
     if player == game.active_player and my_moves == 0:
         return float('-inf')
@@ -139,9 +141,6 @@ class CustomPlayer:
         # Perform any required initializations, including selecting an initial
         # move from the game board (i.e., an opening book), or returning
         # immediately if there are no legal moves
-        if game.get_player_location(game.active_player) == isolation.Board.NOT_MOVED:
-            legal_moves = game.get_legal_moves()
-            return legal_moves[random.randint(0, len(legal_moves)-1)]
 
         best_move = (-1, -1)
         try:
@@ -164,7 +163,7 @@ class CustomPlayer:
                     depth += 1
 
         except Timeout:
-            # return onen of the legal moves if algorithm returned invalid move
+            # return one of the legal moves if algorithm returned invalid move
             if best_move == (-1, -1):
                 legal_moves = game.get_legal_moves()
                 if len(legal_moves) > 0:
