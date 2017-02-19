@@ -5,7 +5,7 @@ The following table summarizes the comparison of the improved heuristic versus s
 
 The first heuristic I tried is just an optimization on the improved heuristic. I noticed the redundant call to `get_legal_move` function which can be done only once in the heuristic function to speed up the search and increase the depth. The results show no improvement.
 
-The second try was to do the opposite of what the improved heuristic does - in the beginning of the game prefer boards with minimum number of moves for your agent. The idea is to cover the board more evenly by choosing the moves closer to the side of the board.  
+The second try was to do the opposite of what the improved heuristic does - in the beginning of the game prefer boards with minimum number of moves for your agent. The idea is to cover the board on the outside in the beginning of the game and to move to the center in the end when iterative deepening is able to go all the way to the terminal nodes.
 ```
 if game.move_count < (game.width * game length) / 3:
   return (opp_moves - my_moves)
@@ -14,7 +14,7 @@ else:
 ```
 The results are in the Opposite column and not much different from ID_Improved.
 
-The last heuristic takes the same idea to cover the board more evenly first in the area with high indices by adding the product of location coordinates to the score according to this formula:  
+The last heuristic takes the same idea to focus in a specific part of the board in the beginning of the game by adding  the product of location coordinates to the score according to this formula:  
 ```
 (my_moves - opp_moves) + (locx * locy) / move_count
 ```
