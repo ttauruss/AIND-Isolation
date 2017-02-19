@@ -7,7 +7,7 @@ Minimax algorithm with alpha-beta pruning expands all nodes at each depth level 
 
 Generalized mean values theory states that the maximum of a set of values is a p-mean when p approches the infinity and the minimum of a set of values is a p-mean when p approches the minus infinity. A large value of p (e.g. 10) will give a good approximation of min/max values. The difference between the usual min/max function and the one proposed in the paper is that the latter has continuous derivative and that fact the author uses to define the penalty function.
 
-In order to cope with computational difficulty of computing the generalized p-means the author proposes to skip the computation altogether and to use appropriate min/max values instead which must be very close to the generalized p-means. This is called "reverse approximation".
+In order to cope with computational difficulty of computing the generalized p-means the author proposes to skip the computation altogether and to use appropriate min/max values instead which must be very close to the generalized p-means. This is called "reverse approximation". In the end we are interested in the derivative of that function hence an approximation of its value should suffice.
 
 The author concludes with experimental results demonstrating that his technique can give better results than minimax algorithm with alpha-beta pruning. The proposed algorithm (MM) was compared to alpha-beta pruning algorithm (AB) to play the game "Connect-Four". Both time (1 to 5 seconds) and move (1000 to 5000 moves) bounds were used to compare the algorithms. The results show that AB is superior to MM when time bounds are used. However, when resource limits are move-based the MM algorithm is definitely superior.
 
