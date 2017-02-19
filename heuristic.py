@@ -1,22 +1,54 @@
 import random
 import isolation
 
-def custom_score(game, player):
-    my_moves = len(game.get_legal_moves(player))
-    if player == game.active_player and my_moves == 0:
-        return float('-inf')
-    return float(my_moves)
-
-def custom_score3(game, player):
+def custom_score_division(game, player):
     if game.is_loser(player):
         return float("-inf")
 
     if game.is_winner(player):
         return float("inf")
 
-    own_moves = len(game.get_legal_moves(player))
+    my_moves = len(game.get_legal_moves(player))
     opp_moves = len(game.get_legal_moves(game.get_opponent(player)))
-    return float(own_moves - opp_moves)
+    if (opp_moves == 0):
+        return float('inf')
+    return float(my_moves) / float(opp_moves)
+
+def custom_score_opposite(game, player):
+    my_moves = len(game.get_legal_moves(player))
+    if player == game.active_player and my_moves == 0:
+        return float('-inf')
+
+    opp_moves = len(game.get_legal_moves(game.get_opponent(player)))
+    if player == game.inactive_player and opp_moves == 0:
+        return float('inf')
+
+    if game.move_count < 20:
+        return float(opp_moves - my_moves)
+    else:
+        return float(my_moves - opp_moves)
+
+def custom_score_improved_optimized(game, player):
+    my_moves = len(game.get_legal_moves(player))
+    if player == game.active_player and my_moves == 0:
+        return float('-inf')
+
+    opp_moves = len(game.get_legal_moves(game.get_opponent(player)))
+    if player == game.inactive_player and opp_moves == 0:
+        return float('inf')
+
+    return float(my_moves - opp_moves)
+
+def custom_score_improved(game, player):
+    if game.is_loser(player):
+        return float("-inf")
+
+    if game.is_winner(player):
+        return float("inf")
+
+    my_moves = len(game.get_legal_moves(player))
+    opp_moves = len(game.get_legal_moves(game.get_opponent(player)))
+    return float(my_moves - opp_moves)
 
 def custom_score2(game, player):
 
