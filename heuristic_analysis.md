@@ -32,4 +32,7 @@ The last heuristic takes the same idea to focus in a specific part of the board 
 I divide it by `move_count` to decrease the importance of location feature as game goes on.
 This heuristic is called Location in the table and that's the one I decided to submit as my custom_score.
 
-To summarize I recommend to use the Location heuristic because it showed slightly better performance than others.
+To summarize I recommend to use the Location heuristic because:  
+* it showed better performance than others  
+* it has two features - moves and location  
+* it behaves differently at different stages of the game by incorporating move count in the formula
